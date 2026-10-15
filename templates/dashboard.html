@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>หน้าหลัก | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-12">
+    {{template "nav" .}}
+
+    <div class="max-w-6xl mx-auto px-4 mt-10 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold">บอร์ดหาคนเตะบอล ⚽</h1>
+            <p class="text-zinc-400 mt-1">กดเข้าร่วมทีม หรือสร้างประกาศใหม่ของคุณเอง</p>
+        </div>
+        <a href="/match/create" class="bg-white text-zinc-950 hover:bg-zinc-200 font-bold py-2.5 px-5 rounded-lg shadow-lg transition">+ สร้างประกาศหาคน</a>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4">
+        {{if eq (len .Matches) 0}}
+        <div class="text-center py-20 bg-zinc-900/50 rounded-2xl border border-zinc-800 border-dashed">
+            <p class="text-zinc-500">ยังไม่มีประกาศหาคนเตะตอนนี้ เป็นคนแรกสิ!</p>
+        </div>
+        {{else}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {{range .Matches}}
+            <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-5 shadow-lg flex flex-col relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-pink-500 to-purple-600"></div>
+                <div class="flex justify-between items-start mb-2 pl-3 gap-2">
+                    <h2 class="text-lg font-bold text-white break-words">{{.Title}}</h2>
+                    <span class="bg-zinc-800 text-pink-400 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">ขาด {{.PlayersNeeded}} คน</span>
+                </div>
+                <div class="pl-3 text-sm text-zinc-400 mb-4 space-y-1">
+                    <p>🏟️ สนาม: <span class="text-zinc-200">{{.PitchType}}</span></p>
+                    <p>👑 หัวหน้าทีม: <span class="text-pink-300 font-medium">{{.TeamName}}</span> ({{.OwnerName}})</p>
+                    <p>📞 ติดต่อหัวหน้า: {{.OwnerPhone}}</p>
+                </div>
+                <div class="pl-3 mb-4 flex-1">
+                    <p class="text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wide">ผู้ที่เข้าร่วมแล้ว ({{.CurrentJoin}}/{{.PlayersNeeded}})</p>
+                    {{if eq .CurrentJoin 0}}
+                        <p class="text-sm text-zinc-600 italic">ยังไม่มีผู้เข้าร่วม</p>
+                    {{else}}
+                        <ul class="space-y-2">
+                            {{range .Joiners}}
+                            <li class="bg-zinc-950 px-3 py-2 rounded-lg text-sm flex justify-between border border-zinc-800/50">
+                                <span class="text-zinc-300">👤 {{.Username}}</span>
+                                {{if .Phone}}<span class="text-zinc-500 text-xs">📞 {{.Phone}}</span>{{end}}
+                            </li>
+                            {{end}}
+                        </ul>
+                    {{end}}
+                </div>
+                <div class="border-t border-zinc-800 pt-4 pl-3 mt-auto">
+                    {{if .IsOwner}}
+                        <div class="flex gap-2">
+                            <a href="/match/edit?id={{.ID}}" class="flex-1 text-center text-yellow-300 bg-yellow-500/10 hover:bg-yellow-500/20 py-2 rounded-lg text-sm font-bold transition">แก้ไข</a>
+                            <form action="/match/delete" method="POST" data-confirm="ลบประกาศนี้ใช่หรือไม่?" class="flex-1">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                                <input type="hidden" name="id" value="{{.ID}}">
+                                <button type="submit" class="w-full text-red-400 bg-red-500/10 hover:bg-red-500/20 py-2 rounded-lg text-sm font-bold transition">ลบ</button>
+                            </form>
+                        </div>
+                    {{else if .HasJoined}}
+                        <button disabled class="w-full bg-zinc-800 text-zinc-500 py-2 rounded-lg text-sm font-bold cursor-not-allowed">คุณเข้าร่วมแล้ว</button>
+                    {{else if ge .CurrentJoin .PlayersNeeded}}
+                        <button disabled class="w-full bg-zinc-800 text-zinc-500 py-2 rounded-lg text-sm font-bold cursor-not-allowed">เต็มแล้ว</button>
+                    {{else}}
+                        <form action="/match/join" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                            <input type="hidden" name="match_id" value="{{.ID}}">
+                            <button type="submit" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 text-white py-2 rounded-lg text-sm font-bold transition shadow-lg">ขอเข้าร่วมทีม</button>
+                        </form>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

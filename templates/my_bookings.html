@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>การจองของฉัน | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-12">
+    {{template "nav" .}}
+    <div class="max-w-4xl mx-auto px-4 mt-10">
+        <h1 class="text-3xl font-bold mb-8">การจองของฉัน 📋</h1>
+        {{if eq (len .Bookings) 0}}
+        <div class="text-center py-16 bg-zinc-900/50 rounded-2xl border border-zinc-800 border-dashed">
+            <p class="text-zinc-500">คุณยังไม่มีการจอง <a href="/pitches" class="text-pink-400 underline">จองสนามเลย</a></p>
+        </div>
+        {{else}}
+        <div class="space-y-3">
+            {{range .Bookings}}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <p class="font-bold text-white">{{.PitchName}}</p>
+                    <p class="text-sm text-zinc-400">{{.BookingDate}} เวลา {{.StartTime}} น.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    {{if eq .Status "Approved"}}
+                        <span class="text-green-400 font-medium text-sm">อนุมัติแล้ว</span>
+                    {{else}}
+                        <span class="text-yellow-400 font-medium text-sm">รอตรวจสอบ</span>
+                    {{end}}
+                    <form action="/booking/cancel" method="POST" data-confirm="ยกเลิกการจองนี้ใช่หรือไม่?">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                        <input type="hidden" name="id" value="{{.ID}}">
+                        <button type="submit" class="text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-md text-sm transition">ยกเลิก</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

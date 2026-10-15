@@ -1,0 +1,20 @@
+{{define "nav"}}
+<nav class="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between min-h-16 py-2 flex-wrap gap-2">
+            <a href="/" class="font-bold text-xl tracking-wide">J-MATCH<span class="text-pink-500">ARENA</span></a>
+            <div class="flex items-center gap-4 flex-wrap">
+                <a href="/" class="text-sm {{if eq .Active "match"}}text-pink-500 font-bold{{else}}text-zinc-400 hover:text-white transition{{end}}">หาคนเตะ</a>
+                <a href="/pitches" class="text-sm {{if eq .Active "pitch"}}text-pink-500 font-bold{{else}}text-zinc-400 hover:text-white transition{{end}}">จองสนาม</a>
+                <a href="/my-bookings" class="text-sm {{if eq .Active "mine"}}text-pink-500 font-bold{{else}}text-zinc-400 hover:text-white transition{{end}}">การจองของฉัน</a>
+                {{if eq .Role "admin"}}<a href="/admin" class="text-sm text-purple-400 hover:text-purple-300 transition">แอดมิน</a>{{end}}
+                <span class="text-sm font-medium text-pink-300 px-3 py-1 bg-zinc-900 rounded-full border border-zinc-800">👤 {{.Username}}</span>
+                <form action="/logout" method="POST" class="inline">
+                    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+                    <button type="submit" class="text-sm text-red-400 hover:text-red-300 transition">ออก</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+{{end}}

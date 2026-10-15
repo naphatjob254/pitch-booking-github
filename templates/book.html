@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>ระบุเวลาจอง | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
+    {{template "nav" .}}
+    <div class="flex items-center justify-center p-4">
+    <div class="bg-zinc-900 p-8 rounded-2xl border border-zinc-800 w-full max-w-md shadow-2xl relative overflow-hidden mt-6">
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pink-500 to-purple-500"></div>
+        <h1 class="text-2xl font-bold mb-2">ระบุเวลาการจอง 📅</h1>
+        <p class="text-zinc-400 mb-6 border-b border-zinc-800 pb-4">คุณกำลังจอง: <span class="text-pink-400 font-semibold">{{.Pitch.Name}}</span> (฿{{.Pitch.PricePerHour}}/ชม.)</p>
+        {{if .Error}}
+        <div class="mb-5 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium">{{.Error}}</div>
+        {{end}}
+        <form action="/book" method="POST" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+            <input type="hidden" name="pitch_id" value="{{.Pitch.ID}}">
+            <div>
+                <label class="block text-sm text-zinc-300 mb-1">วันที่ต้องการจอง</label>
+                <input type="date" name="booking_date" required min="{{.MinDate}}" class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 text-white outline-none" style="color-scheme: dark;">
+            </div>
+            <div>
+                <label class="block text-sm text-zinc-300 mb-1">เวลาเริ่มเตะ (จองเป็นรายชั่วโมง)</label>
+                <input type="time" name="start_time" required step="3600" class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 text-white outline-none" style="color-scheme: dark;">
+            </div>
+            <div>
+                <label class="block text-sm text-zinc-300 mb-1">เบอร์ติดต่อกลับ (แอดมิน)</label>
+                <input type="tel" name="contact_phone" required maxlength="12" placeholder="ใส่เบอร์โทรศัพท์ของคุณ" class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 text-white outline-none">
+            </div>
+            <div class="pt-4 flex gap-4">
+                <button type="submit" class="flex-1 bg-pink-600 hover:bg-pink-500 font-bold py-3 rounded-lg shadow-lg transition">ยืนยันจอง</button>
+                <a href="/pitches" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-center py-3 rounded-lg font-bold transition">ยกเลิก</a>
+            </div>
+        </form>
+    </div>
+    </div>
+</body>
+</html>

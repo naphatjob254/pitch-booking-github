@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>{{if .Edit}}แก้ไขโพสต์{{else}}สร้างโพสต์หาเพื่อนร่วมทีม{{end}} | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
+    {{template "nav" .}}
+    <div class="flex items-center justify-center p-6">
+    <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-2xl w-full max-w-lg mt-6">
+        <div class="mb-6 border-b border-zinc-800 pb-4">
+            <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
+                {{if .Edit}}แก้ไขประกาศ ✏️{{else}}ฟอร์มหาเพื่อนร่วมทีม 🏃‍♂️{{end}}
+            </h1>
+            <p class="text-zinc-400 text-sm mt-1">โพสต์ประกาศหาคนจอยเตะฟุตบอลร่วมกัน</p>
+        </div>
+        {{if .Error}}
+        <div class="mb-5 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium">{{.Error}}</div>
+        {{end}}
+        <form action="{{.Action}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+            {{if .Edit}}<input type="hidden" name="id" value="{{.Match.ID}}">{{end}}
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">ชื่อทีม / ผู้จัด</label>
+                <input type="text" name="team_name" required maxlength="50" value="{{.Match.TeamName}}" placeholder="เช่น หม่ำFc"
+                       class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white placeholder-zinc-600">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">หัวข้อประกาศ / รายละเอียด</label>
+                <input type="text" name="title" required maxlength="100" value="{{.Match.Title}}" placeholder="เช่น ขาด 1 ขอเก่งๆ"
+                       class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white placeholder-zinc-600">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">เลือกสนามที่จะไปเตะ</label>
+                {{$sel := .Match.PitchType}}
+                <select name="pitch_type" required class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white">
+                    <option value="" disabled {{if not $sel}}selected{{end}}>-- เลือกสนามจากระบบ --</option>
+                    {{range .Pitches}}
+                    {{$v := printf "%s (%s)" .Name .PitchType}}
+                    <option value="{{$v}}" {{if eq $v $sel}}selected{{end}}>{{.Name}} - [{{.PitchType}}]</option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">จำนวนคนที่ขาด (1-30 คน)</label>
+                <input type="number" name="players_needed" min="1" max="30" required value="{{if .Match.PlayersNeeded}}{{.Match.PlayersNeeded}}{{end}}" placeholder="เช่น 2"
+                       class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white placeholder-zinc-600">
+            </div>
+            <div class="flex gap-4 pt-2">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg shadow-lg">{{if .Edit}}บันทึกการแก้ไข{{else}}โพสต์ประกาศ{{end}}</button>
+                <a href="/" class="px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-lg text-center transition">ยกเลิก</a>
+            </div>
+        </form>
+    </div>
+    </div>
+</body>
+</html>
