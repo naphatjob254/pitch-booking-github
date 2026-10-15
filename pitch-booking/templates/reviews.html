@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>รีวิว {{.Pitch.Name}} | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-12">
+    {{template "nav" .}}
+    <div class="max-w-3xl mx-auto px-4 mt-10">
+        <a href="/pitches" class="text-sm text-zinc-400 hover:text-white transition">← กลับไปหน้าจองสนาม</a>
+        <h1 class="text-3xl font-bold mt-3">รีวิว {{.Pitch.Name}} ⭐</h1>
+        <p class="text-zinc-400 mt-1">
+            <span class="text-yellow-400 text-lg">{{.Pitch.Stars}}</span>
+            {{if .Pitch.ReviewCount}}{{.Pitch.AvgRating}} / 5 จาก {{.Pitch.ReviewCount}} รีวิว{{else}}ยังไม่มีรีวิว เป็นคนแรกสิ!{{end}}
+        </p>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-8">
+            <h2 class="text-lg font-bold mb-4 text-pink-400">{{if .HasMine}}แก้ไขรีวิวของคุณ{{else}}เขียนรีวิว{{end}}</h2>
+            {{if .Error}}
+            <div class="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium">{{.Error}}</div>
+            {{end}}
+            <form action="/reviews" method="POST" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+                <input type="hidden" name="pitch_id" value="{{.Pitch.ID}}">
+                <div>
+                    <label class="block text-sm text-zinc-300 mb-1">ให้คะแนน</label>
+                    <select name="rating" required class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white">
+                        <option value="" disabled {{if not .MyRating}}selected{{end}}>-- เลือกคะแนน --</option>
+                        <option value="5" {{if eq .MyRating 5}}selected{{end}}>★★★★★ ดีเยี่ยม</option>
+                        <option value="4" {{if eq .MyRating 4}}selected{{end}}>★★★★☆ ดี</option>
+                        <option value="3" {{if eq .MyRating 3}}selected{{end}}>★★★☆☆ ปานกลาง</option>
+                        <option value="2" {{if eq .MyRating 2}}selected{{end}}>★★☆☆☆ พอใช้</option>
+                        <option value="1" {{if eq .MyRating 1}}selected{{end}}>★☆☆☆☆ ควรปรับปรุง</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-zinc-300 mb-1">ความคิดเห็น (ไม่บังคับ ไม่เกิน 500 ตัวอักษร)</label>
+                    <textarea name="comment" rows="3" maxlength="500" placeholder="สภาพหญ้า แสงไฟ ความสะอาด ฯลฯ"
+                        class="w-full p-3 bg-zinc-950 rounded-lg border border-zinc-700 focus:border-pink-500 outline-none text-white placeholder-zinc-600">{{.MyComment}}</textarea>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg shadow-lg">{{if .HasMine}}บันทึกการแก้ไข{{else}}ส่งรีวิว{{end}}</button>
+            </form>
+        </div>
+
+        <div class="mt-8 space-y-3">
+            {{range .Reviews}}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                <div class="flex justify-between items-start gap-3 flex-wrap">
+                    <div>
+                        <p class="font-bold text-white">👤 {{.Username}}{{if .IsOwner}} <span class="text-xs text-pink-400">(คุณ)</span>{{end}}</p>
+                        <p class="text-yellow-400">{{.Stars}} <span class="text-xs text-zinc-500 ml-2">{{.UpdatedAt}}</span></p>
+                    </div>
+                    {{if .IsOwner}}
+                    <form action="/review/delete" method="POST" data-confirm="ลบรีวิวของคุณใช่หรือไม่?">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                        <input type="hidden" name="id" value="{{.ID}}">
+                        <input type="hidden" name="pitch_id" value="{{$.Pitch.ID}}">
+                        <button type="submit" class="text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-md text-sm transition">ลบรีวิว</button>
+                    </form>
+                    {{end}}
+                </div>
+                {{if .Comment}}<p class="text-zinc-300 text-sm mt-2 break-words">{{.Comment}}</p>{{end}}
+            </div>
+            {{else}}
+            <div class="text-center py-10 bg-zinc-900/50 rounded-2xl border border-zinc-800 border-dashed text-zinc-500">ยังไม่มีรีวิวสำหรับสนามนี้</div>
+            {{end}}
+        </div>
+    </div>
+</body>
+</html>

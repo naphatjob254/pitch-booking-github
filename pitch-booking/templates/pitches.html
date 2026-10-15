@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>เลือกสนาม | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen pb-12">
+    {{template "nav" .}}
+    <div class="max-w-6xl mx-auto px-4 mt-10">
+        <h1 class="text-3xl font-bold mb-8">จองสนามฟุตบอล 🏟️</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{range .Pitches}}
+            <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 hover:border-pink-500 transition shadow-lg flex flex-col">
+                {{if eq .ID 1}}
+                    <img src="/static/7.jpg" alt="{{.Name}}" class="w-full h-48 object-cover">
+                {{else if eq .ID 2}}
+                    <img src="/static/9.jpg" alt="{{.Name}}" class="w-full h-48 object-cover">
+                {{else if eq .ID 3}}
+                    <img src="/static/11.jpg" alt="{{.Name}}" class="w-full h-48 object-cover">
+                {{else}}
+                    <img src="/static/logo.png" alt="{{.Name}}" class="w-full h-48 object-cover bg-zinc-800 p-4">
+                {{end}}
+                <div class="p-5 flex-1 flex flex-col">
+                    <h2 class="text-xl font-bold text-white mb-2">{{.Name}}</h2>
+                    <div class="flex justify-between text-sm text-zinc-400 mb-3">
+                        <span>ประเภท: {{.PitchType}}</span>
+                        <span class="text-pink-400 font-bold">฿{{.PricePerHour}} / ชม.</span>
+                    </div>
+                    <a href="/reviews?pitch_id={{.ID}}" class="text-sm mb-5 text-zinc-400 hover:text-white transition">
+                        <span class="text-yellow-400">{{.Stars}}</span>
+                        {{if .ReviewCount}}{{.AvgRating}} ({{.ReviewCount}} รีวิว){{else}}ยังไม่มีรีวิว{{end}}
+                        <span class="text-pink-400 underline ml-1">ดู/เขียนรีวิว</span>
+                    </a>
+                    <a href="/book?pitch_id={{.ID}}" class="block text-center w-full mt-auto bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl transition shadow-lg">จองสนามนี้</a>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</body>
+</html>

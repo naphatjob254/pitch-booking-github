@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>สมัครสมาชิก | J MATCH ARENA</title>
+</head>
+<body class="bg-[url('https://images.unsplash.com/photo-1518605368461-1e96a29ec1b4?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center min-h-screen flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-zinc-950/85 backdrop-blur-md"></div>
+    <div class="relative z-10 bg-zinc-900/90 p-10 rounded-3xl shadow-[0_0_40px_rgba(236,72,153,0.15)] w-full max-w-md border border-zinc-800">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-2 tracking-wider">J MATCH ARENA</h1>
+            <p class="text-zinc-400 text-sm">สร้างบัญชีใหม่เพื่อเข้าใช้งานระบบ</p>
+        </div>
+        {{if .Error}}
+        <div class="mb-5 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium text-center">{{.Error}}</div>
+        {{end}}
+        <form action="/register" method="POST" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" name="username" required minlength="3" maxlength="30" value="{{.FormUsername}}" autocomplete="username" placeholder="3-30 ตัว (ก-ฮ a-z 0-9 _)"
+                       class="w-full p-3 bg-zinc-950 rounded-xl border border-zinc-800 focus:border-pink-500 outline-none text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">เบอร์โทรศัพท์</label>
+                <input type="tel" name="phone" required maxlength="12" value="{{.FormPhone}}" placeholder="08x-xxx-xxxx"
+                       class="w-full p-3 bg-zinc-950 rounded-xl border border-zinc-800 focus:border-pink-500 outline-none text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-300 mb-1">รหัสผ่าน (อย่างน้อย 8 ตัว)</label>
+                <input type="password" name="password" required minlength="8" maxlength="72" autocomplete="new-password" placeholder="ตั้งรหัสผ่าน"
+                       class="w-full p-3 bg-zinc-950 rounded-xl border border-zinc-800 focus:border-pink-500 outline-none text-white">
+            </div>
+            <button type="submit" class="w-full mt-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg">สมัครสมาชิก</button>
+        </form>
+        <p class="mt-6 text-center text-sm text-zinc-400">มีบัญชีอยู่แล้ว? <a href="/login" class="text-pink-400 font-semibold hover:text-pink-300">เข้าสู่ระบบ</a></p>
+    </div>
+</body>
+</html>

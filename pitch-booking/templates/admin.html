@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Kanit', sans-serif; } </style>
+    <script src="/static/app.js" defer></script>
+    <title>Admin Panel | J MATCH ARENA</title>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen p-4 sm:p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4 flex-wrap gap-3">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">ระบบจัดการแอดมิน : J MATCH ARENA</h1>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-pink-300">👤 {{.Username}}</span>
+                <form action="/logout" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+                    <button type="submit" class="px-5 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-lg font-medium transition">ออกจากระบบ</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-2xl p-6 shadow-xl mb-8 border border-zinc-800">
+            <h2 class="text-xl font-bold mb-4 text-pink-400">จัดการโพสต์หาคนเตะ (Matches)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-zinc-400">
+                    <thead class="text-xs text-zinc-300 uppercase bg-zinc-800/50">
+                        <tr>
+                            <th class="px-4 py-3">ID</th><th class="px-4 py-3">ผู้โพสต์</th><th class="px-4 py-3">ชื่อทีม</th>
+                            <th class="px-4 py-3">หัวข้อ</th><th class="px-4 py-3">สนามที่ต้องการ</th><th class="px-4 py-3">ต้องการคน</th>
+                            <th class="px-4 py-3 text-right">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Matches}}
+                        <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 transition">
+                            <td class="px-4 py-3">{{.ID}}</td>
+                            <td class="px-4 py-3 font-medium text-white">{{.Username}}</td>
+                            <td class="px-4 py-3 text-pink-300">{{.TeamName}}</td>
+                            <td class="px-4 py-3">{{.Title}}</td>
+                            <td class="px-4 py-3">{{.PitchType}}</td>
+                            <td class="px-4 py-3">{{.PlayersNeeded}}</td>
+                            <td class="px-4 py-3 text-right">
+                                <form action="/admin/delete-match" method="POST" data-confirm="แน่ใจหรือไม่ว่าจะลบโพสต์นี้?" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                                    <input type="hidden" name="id" value="{{.ID}}">
+                                    <button type="submit" class="text-red-500 hover:text-red-400 font-semibold bg-red-500/10 px-3 py-1 rounded-md transition">ลบโพสต์</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{else}}
+                        <tr><td colspan="7" class="px-4 py-6 text-center text-zinc-500">ยังไม่มีข้อมูลโพสต์หาคนเตะ</td></tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 text-purple-400">จัดการคิวจองสนาม (Bookings)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-zinc-400">
+                    <thead class="text-xs text-zinc-300 uppercase bg-zinc-800/50">
+                        <tr>
+                            <th class="px-4 py-3">ผู้จอง</th><th class="px-4 py-3">เบอร์ติดต่อ</th><th class="px-4 py-3">สนามที่จอง</th>
+                            <th class="px-4 py-3">วันที่ / เวลา</th><th class="px-4 py-3">สถานะ</th><th class="px-4 py-3 text-right">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Bookings}}
+                        <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 transition">
+                            <td class="px-4 py-3 font-medium text-white">{{.Username}}</td>
+                            <td class="px-4 py-3 text-pink-300">{{.Phone}}</td>
+                            <td class="px-4 py-3">{{.PitchName}}</td>
+                            <td class="px-4 py-3">{{.BookingDate}} ({{.StartTime}} น.)</td>
+                            <td class="px-4 py-3">
+                                {{if eq .Status "Approved"}}<span class="text-green-400 font-medium">อนุมัติแล้ว</span>{{else}}<span class="text-yellow-400 font-medium">รอตรวจสอบ</span>{{end}}
+                            </td>
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                {{if ne .Status "Approved"}}
+                                <form action="/admin/approve-booking" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                                    <input type="hidden" name="id" value="{{.ID}}">
+                                    <button type="submit" class="text-green-500 hover:text-green-400 bg-green-500/10 px-3 py-1 rounded-md mr-2 transition">อนุมัติ</button>
+                                </form>
+                                {{end}}
+                                <form action="/admin/delete-booking" method="POST" data-confirm="ยกเลิกการจองนี้ใช่หรือไม่?" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                                    <input type="hidden" name="id" value="{{.ID}}">
+                                    <button type="submit" class="text-red-500 hover:text-red-400 bg-red-500/10 px-3 py-1 rounded-md transition">ลบ</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{else}}
+                        <tr><td colspan="6" class="px-4 py-6 text-center text-zinc-500">ยังไม่มีข้อมูลการจองสนาม</td></tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 shadow-xl mt-8">
+            <h2 class="text-xl font-bold mb-4 text-yellow-400">จัดการรีวิวสนาม (Reviews)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-zinc-400">
+                    <thead class="text-xs text-zinc-300 uppercase bg-zinc-800/50">
+                        <tr>
+                            <th class="px-4 py-3">ผู้รีวิว</th><th class="px-4 py-3">สนาม</th><th class="px-4 py-3">คะแนน</th>
+                            <th class="px-4 py-3">ความคิดเห็น</th><th class="px-4 py-3 text-right">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Reviews}}
+                        <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 transition">
+                            <td class="px-4 py-3 font-medium text-white">{{.Username}}</td>
+                            <td class="px-4 py-3">{{.PitchName}}</td>
+                            <td class="px-4 py-3 text-yellow-400 whitespace-nowrap">{{.Stars}}</td>
+                            <td class="px-4 py-3 break-words max-w-xs">{{.Comment}}</td>
+                            <td class="px-4 py-3 text-right">
+                                <form action="/admin/delete-review" method="POST" data-confirm="ลบรีวิวนี้ใช่หรือไม่?" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+                                    <input type="hidden" name="id" value="{{.ID}}">
+                                    <button type="submit" class="text-red-500 hover:text-red-400 bg-red-500/10 px-3 py-1 rounded-md transition">ลบ</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {{else}}
+                        <tr><td colspan="5" class="px-4 py-6 text-center text-zinc-500">ยังไม่มีรีวิว</td></tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
